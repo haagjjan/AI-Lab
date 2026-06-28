@@ -1,0 +1,23 @@
+# Notes Day 1 #
+
+Answer to the Question:
+
+## How does Attention work, and what problem does it solve? ##
+
+
+Starting of with the basics:
+
+1. A Transformer takes in a input, often times structured as a human redable text.
+2. This Text gets then broken down into a unit for LLMs - the so called Tokens.
+    Every token has a distinct Token_ID, which is unique. In GPT 3 it was composed of about 50k Token_IDs.
+3. Afterwards every token gets embedded. That means every token is transformed into a embedding.
+    A Emedding is a high demensional Vector, that tries to express the meaning of the token. A demention could be understood as a certain caracteristic, eg Mass or Sex as a characteristic.
+4. Now that we have the vector translation of every token, we try to change the meanings of these   tokens, that mean something differently in the destinct context that they are currently in. 
+    We get this done with attention. Every word gets a strongness from 0 - 1, whith which its meaning is tansposed onto every other token. Since the token sequence isnt recorded automatically, this is also done by position embedding.
+5. If token 1 has a strong attention to token 2, it means that that vector 2 gets shifted, by adding vector 1 to it. That way vector 2 getts a new meaning, which is in the context of the meaning of vector 1. 
+
+**This solves the Problem:**
+
+That Words can have different meaning based on the context they come up in. Fore example the sentances: "It is useful to live by the approach of eating the frog", and "We dont eat the frog", have 2 completely different meanings, eventhough they use similar words. 
+
+
