@@ -5,7 +5,7 @@
 
 ---
 
-## Day 1 — Transformers & Embeddings
+## Day 1 — Transformers & Embeddings - Mo - 29. Jun
 **Assignment: Transformer Architecture Review**  
 **Deadline: End of Day 1**
 
@@ -39,7 +39,7 @@ Before closing my laptop I must be able to answer this out loud without notes:
 
 ---
 
-## Day 2 — RAG Pipelines + Framework Decision
+## Day 2 — RAG Pipelines + Framework Decision - Tue 30. Jun
 **Assignment: RAG Pipeline Mapping & Framework Commitment**  
 **Deadline: End of Day 2**
 
@@ -74,7 +74,7 @@ Before closing my laptop:
 
 ---
 
-## Day 3 — Agents & Tool Use
+## Day 3 — Agents & Tool Use - Wed 1. Jul
 **Assignment: Agent Architecture Introduction**  
 **Deadline: End of Day 3**
 
