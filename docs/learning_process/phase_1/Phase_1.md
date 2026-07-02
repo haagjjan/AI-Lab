@@ -63,13 +63,8 @@ One card per concept, own phrasing:
 Draw the full RAG pipeline (all 5 stages, labeled, with arrows showing data flow). Digital or hand-drawn — both are valid.  
 Save to: `docs/learning_process/phase_1/Day2_RAG_Pipeline_Diagram.md` *(or attach image in the repository)*
 
-**D2.3 — Framework Decision Record** *(1 paragraph)*  
-State which framework I chose (LangChain or LlamaIndex) and why in one paragraph. This decision is final — no revisiting after today.  
-Save to: `docs/learning_process/phase_1/Day2_Framework_Decision.md`
-
 ### Day 2 Checkpoint
 Before closing my laptop:
-- My framework is chosen and written down
 - I can walk through all 5 RAG pipeline stages from memory
 
 ---
@@ -105,11 +100,16 @@ Save to: `docs/learning_process/phase_1/Day3_RAG_vs_Agent.md`
 Draw or write out the ReAct loop as a cycle. Label each stage. Must be produceable from memory.  
 Save to: `docs/learning_process/phase_1/Day3_ReAct_Diagram.md`
 
+**D3.4 — Framework Decision Record** *(1 paragraph)*  - was initially day 2
+State which framework I chose (LangChain or LlamaIndex) and why in one paragraph. This decision is final — no revisiting after today.  
+Save to: `docs/learning_process/phase_1/Day2_Framework_Decision.md`
+
 ### Day 3 Checkpoint
 Before closing my laptop:
 - I can explain what a tool is in the agent context
 - I can explain why a ReAct loop is more flexible than a fixed pipeline
 - I can name one situation where an agent is overkill
+- framework is chosen
 
 ---
 
