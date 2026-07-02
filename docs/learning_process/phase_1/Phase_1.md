@@ -5,7 +5,7 @@
 
 ---
 
-## Day 1 — Transformers & Embeddings - Mo - 29. Jun
+## Day 1 — Transformers & Embeddings - Wnd 1. jul
 **Assignment: Transformer Architecture Review**  
 **Deadline: End of Day 1**
 
@@ -39,7 +39,7 @@ Before closing my laptop I must be able to answer this out loud without notes:
 
 ---
 
-## Day 2 — RAG Pipelines + Framework Decision - Tue 30. Jun
+## Day 2 — RAG Pipelines + Framework Decision - Thu 2. jul
 **Assignment: RAG Pipeline Mapping & Framework Commitment**  
 **Deadline: End of Day 2**
 
@@ -51,8 +51,8 @@ Before closing my laptop I must be able to answer this out loud without notes:
 ### Deliverables
 **D2.1 — Anki Deck: RAG** *(12 cards minimum)*  
 One card per concept, own phrasing:
-- The 5 stages of a RAG pipeline in sequence
-- Chunking — what it is and why chunk size matters
+- The 5 stages of a RAG pipeline in sequence - X
+- Chunking — what it is and why chunk size matters - Chunk Size?
 - Vector store — what it stores, how similarity search works
 - Embedding model vs LLM — what each does in the pipeline
 - Dense retrieval vs sparse/keyword retrieval *(awareness level only)*
@@ -74,7 +74,7 @@ Before closing my laptop:
 
 ---
 
-## Day 3 — Agents & Tool Use - Wed 1. Jul
+## Day 3 — Agents & Tool Use - Fr 3. jul
 **Assignment: Agent Architecture Introduction**  
 **Deadline: End of Day 3**
 
@@ -113,7 +113,7 @@ Before closing my laptop:
 
 ---
 
-## Day 4 — Project Definition + Buffer
+## Day 4 — Project Definition + Buffer - Sa - 4. jul
 **Assignment: Project Specification Document**  
 **Deadline: End of Day 4 — this is the Phase A milestone**
 
