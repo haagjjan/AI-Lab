@@ -6,9 +6,9 @@ Answer to question:
 
 RAG and Agents are two tools used for conceptually different probelm types. They each do their tasks well, but are designed for different tasks entierly. 
 
-**RAG** is designed, to solve the problem of giving a model simply *access* to more recent or personal data. The generation and reasoning capabilities stay the same, the likely hood of hallucination dicreases.
+**RAG** is designed, to solve the problem of giving a model simply *access* to more recent or personal data. The generation and reasoning capabilities stay the same. RAG can effectively decrease the likely hood of hallucination, iff the retrieval is correct.
 
-**Agents pipelines** are designed, to solve more dynamic problems, where somethimes the model needs access to different tools and capabilities. This increases the capability of more flexible or acurate reasoning. An agent runs in a ReAct cycle (Reasoning Action). So if a problem needs to be solved, that needs this ReAct Cycle, it can be solved by an Agents pipeline.
+**Agents pipelines** are designed, to solve more dynamic multi step problems, where somethimes the model needs access to different tools and capabilities. This increases the capability of more flexible or acurate reasoning. An agent runs in a ReAct cycle (Reasoning Action). So if a problem needs to be solved, that needs this ReAct Cycle, it can be solved by an Agents pipeline.
 
 The decision, on which system you should opt for, is almost always best decided, by the criteria of simplicity.
 
