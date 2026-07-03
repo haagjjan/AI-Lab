@@ -25,3 +25,8 @@ The Goal here is not so much as to understand every theory flawlessly. The goal 
 **Concepts I leaned:**
 **Whats next up:**
 
+## Day 3 - Fr, 3.7.26 ##
+
+**What I did:**
+**Concepts I leaned:**
+**Whats next up:**
