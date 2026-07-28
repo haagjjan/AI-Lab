@@ -1,0 +1,5 @@
+
+# Python local environments and secrets
+.env
+.venv/
+__pycache__/
