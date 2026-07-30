@@ -1,18 +1,14 @@
-"""Integrate the configured Google embedding model for documents and questions.
-
-Indexing and query-time embeddings must use the same model, task-compatible
-input formatting, and output dimensionality. No API calls exist in the
-scaffold.
-"""
+"""Create document and query embeddings with the Google Gen AI SDK."""
 
 from collections.abc import Sequence
-
 
 from google import genai
 from google.genai import types
 
 from .config import Settings
 from .schemas import DocumentChunk
+
+_EMBEDDING_BATCH_SIZE = 100
 
 
 def embed_document_chunks(
@@ -53,6 +49,11 @@ def embed_question(question: str, settings: Settings) -> list[float]:
         settings=settings,
     )
 
+    if len(vectors) != 1:
+        raise RuntimeError("The embedding API did not return exactly one query vector.")
+
+    return vectors[0]
+
 
 def _embed_texts(
     texts: Sequence[str],
@@ -60,28 +61,47 @@ def _embed_texts(
     settings: Settings,
 ) -> list[list[float]]:
     """Request embeddings and validate their dimensions."""
+    normalized_texts = [text.strip() for text in texts]
+    if not normalized_texts:
+        return []
+    if any(not text for text in normalized_texts):
+        raise ValueError("Embedding inputs must not be empty.")
+
     client = genai.Client(api_key=settings.google_api_key)
 
-    response = client.models.embed_content(
-        model=settings.embedding_model,
-        contents=list(texts),
-        config=types.EmbedContentConfig(
-            task_type=task_type,
-            output_dimensionality=settings.embedding_dimension,
-        ),
-    )
-
-
-    if not response.embeddings:
-        raise RuntimeError("The embedding API returned no embeddings.")
-
     vectors: list[list[float]] = []
+    config_kwargs: dict[str, str | int] = {"task_type": task_type}
+    if settings.embedding_dimension is not None:
+        config_kwargs["output_dimensionality"] = settings.embedding_dimension
 
-    for embedding in response.embeddings:
-        if embedding.values is None:
-            raise RuntimeError("The embedding API returned an empty vector.")
+    for start in range(0, len(normalized_texts), _EMBEDDING_BATCH_SIZE):
+        batch = normalized_texts[start : start + _EMBEDDING_BATCH_SIZE]
 
-        vectors.append(list(embedding.values))
+        try:
+            response = client.models.embed_content(
+                model=settings.embedding_model,
+                contents=batch,
+                config=types.EmbedContentConfig(**config_kwargs),
+            )
+        except Exception as exc:
+            raise RuntimeError(
+                f"The embedding request failed for model {settings.embedding_model!r}."
+            ) from exc
+
+        if not response.embeddings:
+            raise RuntimeError("The embedding API returned no embeddings.")
+
+        for embedding in response.embeddings:
+            if embedding.values is None:
+                raise RuntimeError("The embedding API returned an empty vector.")
+
+            vectors.append(list(embedding.values))
+
+    if len(vectors) != len(normalized_texts):
+        raise RuntimeError(
+            "The embedding API returned a different number of vectors "
+            "than the number of inputs."
+        )
 
     _validate_embedding_dimensions(
         vectors=vectors,
@@ -110,10 +130,7 @@ def _validate_embedding_dimensions(
                 "The embedding API returned inconsistent vector dimensions."
             )
 
-    if (
-        expected_dimension is not None
-        and actual_dimension != expected_dimension
-    ):
+    if expected_dimension is not None and actual_dimension != expected_dimension:
         raise RuntimeError(
             f"Expected embedding dimension {expected_dimension}, "
             f"but received {actual_dimension}."
