@@ -1,10 +1,4 @@
-"""Discover PDF inputs and extract page-aware text from each document.
-
-PDF discovery and extraction stay together because they form one small input
-boundary. The eventual extractor should preserve filename and page provenance
-and record section information only when it can be detected reliably.
-"""
-
+"""Discover PDF inputs and extract page-aware text from each document."""
 
 from pathlib import Path
 
@@ -15,27 +9,14 @@ from .schemas import ExtractedPage
 
 
 def discover_pdf_files(storage_path: Path) -> list[Path]:
-    """Return PDF files found recursively in deterministic order.
-
-    Args:
-        storage_path: Root folder containing input PDF documents.
-
-    Returns:
-        A list of PDF paths sorted by their relative path.
-
-    Raises:
-        FileNotFoundError: If the configured storage path does not exist.
-        NotADirectoryError: If the configured storage path is not a directory.
-    """
-    storage_path = storage_path.expanduser()
-
-    #Edge cases: empty path, no dir, 
+    """Return recursively discovered PDF files in deterministic order."""
+    storage_path = storage_path.expanduser().resolve()
 
     if not storage_path.exists():
-        raise FileNotFoundError(f"File not found at: {storage_path}")
+        raise FileNotFoundError(f"PDF storage directory does not exist: {storage_path}")
 
     if not storage_path.is_dir():
-        raise NotADirectoryError(f"PDF storage directory at: {storage_path} is no directory: " )
+        raise NotADirectoryError(f"PDF storage path is not a directory: {storage_path}")
 
     pdf_files = [
         path
@@ -49,69 +30,53 @@ def discover_pdf_files(storage_path: Path) -> list[Path]:
     )
 
 
-
 def extract_pdf_pages(pdf_path: Path) -> list[ExtractedPage]:
     """Extract text and page provenance from every page of one PDF.
 
-    Empty pages are retained with an empty string. This function does not
-    perform OCR or infer document sections.
-
-    Args:
-        pdf_path: Path to one PDF file.
-
-    Returns:
-        One ExtractedPage object for every physical PDF page.
-
-    Raises:
-        FileNotFoundError: If the PDF path does not exist.
-        ValueError: If the path is not a PDF or the PDF is encrypted.
-        PdfReadError: If pypdf cannot parse the PDF.
-        RuntimeError: If text extraction fails for a specific page.
+    Empty pages are retained with empty text. OCR and section inference are
+    deliberately outside this small pipeline.
     """
-
-    pdf_path = pdf_path.expanduser()
+    pdf_path = pdf_path.expanduser().resolve()
 
     if not pdf_path.exists():
-        raise FileNotFoundError(f"The pdf Path {pdf_path} doesnt exist")
+        raise FileNotFoundError(f"PDF file does not exist: {pdf_path}")
 
     if not pdf_path.is_file():
-        raise ValueError(f"Path doesn't point to a folder: {pdf_path}")
+        raise ValueError(f"PDF path is not a file: {pdf_path}")
 
     if pdf_path.suffix.casefold() != ".pdf":
-        raise ValueError(f"File not a .pdf at path: {pdf_path}")
+        raise ValueError(f"File does not have a .pdf extension: {pdf_path}")
 
-    extract_pdf_pages: list[ExtractedPage] = []
+    extracted_pages: list[ExtractedPage] = []
 
     try:
         with pdf_path.open("rb") as pdf_file:
             reader = PdfReader(pdf_file, strict=False)
 
             if reader.is_encrypted:
-                raise ValueError(f"The PDF still is encripted: {pdf_path.name}")
+                raise ValueError(f"Encrypted PDFs are not supported: {pdf_path.name}")
 
-            for pagenumber, page in enumerate(reader.pages, start=1):
+            for page_number, page in enumerate(reader.pages, start=1):
                 try:
                     raw_text = page.extract_text()
                 except Exception as exc:
                     raise RuntimeError(
-                        "Failed to extract text form:"
-                        f"{pdf_path.name} page: {pagenumber}"
-                        ) from exc
-
-                text = _normalize_extracted_text(raw_text)
+                        "Failed to extract text from "
+                        f"{pdf_path.name}, page {page_number}."
+                    ) from exc
 
                 extracted_pages.append(
                     ExtractedPage(
-                        source_filename=pdf_path.name,
+                        source_path=pdf_path,
                         page_number=page_number,
-                        text=text,
+                        text=_normalize_extracted_text(raw_text),
                     )
                 )
     except PdfReadError as exc:
-        raise PdfReadError(
-            f"Could not read PDF file: {pdf_path}"
-        ) from exc
+        raise PdfReadError(f"Could not read PDF file: {pdf_path}") from exc
+
     return extracted_pages
+
 
 def _normalize_extracted_text(text: str | None) -> str:
     """Apply minimal normalization without destroying page structure."""
@@ -119,4 +84,3 @@ def _normalize_extracted_text(text: str | None) -> str:
         return ""
 
     return text.replace("\r\n", "\n").replace("\r", "\n").strip()
-
