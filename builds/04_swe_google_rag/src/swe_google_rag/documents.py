@@ -68,3 +68,55 @@ def extract_pdf_pages(pdf_path: Path) -> list[ExtractedPage]:
         PdfReadError: If pypdf cannot parse the PDF.
         RuntimeError: If text extraction fails for a specific page.
     """
+
+    pdf_path = pdf_path.expanduser()
+
+    if not pdf_path.exists():
+        raise FileNotFoundError(f"The pdf Path {pdf_path} doesnt exist")
+
+    if not pdf_path.is_file():
+        raise ValueError(f"Path doesn't point to a folder: {pdf_path}")
+
+    if pdf_path.suffix.casefold() != ".pdf":
+        raise ValueError(f"File not a .pdf at path: {pdf_path}")
+
+    extract_pdf_pages: list[ExtractedPage] = []
+
+    try:
+        with pdf_path.open("rb") as pdf_file:
+            reader = PdfReader(pdf_file, strict=False)
+
+            if reader.is_encrypted:
+                raise ValueError(f"The PDF still is encripted: {pdf_path.name}")
+
+            for pagenumber, page in enumerate(reader.pages, start=1):
+                try:
+                    raw_text = page.extract_text()
+                except Exception as exc:
+                    raise RuntimeError(
+                        "Failed to extract text form:"
+                        f"{pdf_path.name} page: {pagenumber}"
+                        ) from exc
+
+                text = _normalize_extracted_text(raw_text)
+
+                extracted_pages.append(
+                    ExtractedPage(
+                        source_filename=pdf_path.name,
+                        page_number=page_number,
+                        text=text,
+                    )
+                )
+    except PdfReadError as exc:
+        raise PdfReadError(
+            f"Could not read PDF file: {pdf_path}"
+        ) from exc
+    return extracted_pages
+
+def _normalize_extracted_text(text: str | None) -> str:
+    """Apply minimal normalization without destroying page structure."""
+    if text is None:
+        return ""
+
+    return text.replace("\r\n", "\n").replace("\r", "\n").strip()
+
