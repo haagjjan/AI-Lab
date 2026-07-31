@@ -1,9 +1,9 @@
 """Define the shared page, chunk, retrieval, and answer data structures."""
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Mapping, TypeAlias
-
+from typing import TypeAlias
 
 MetadataValue: TypeAlias = str | int | float | bool | None
 
@@ -20,7 +20,7 @@ class ExtractedPage:
 
 @dataclass(frozen=True, slots=True)
 class DocumentChunk:
-    """A token-bounded text chunk with source metadata."""
+    """A lexical-token-bounded text chunk with source metadata."""
 
     chunk_id: str
     text: str
@@ -44,3 +44,14 @@ class RagAnswer:
 
     text: str
     sources: tuple[RetrievedChunk, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class IndexBuildResult:
+    """Summary of a successfully persisted document index."""
+
+    pdf_count: int
+    page_count: int
+    chunk_count: int
+    embedding_dimension: int
+    index_path: Path
