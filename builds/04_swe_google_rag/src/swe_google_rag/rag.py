@@ -58,7 +58,6 @@ def retrieve_for_question(
     )
 
 
-
 def answer_question(question: str, settings: Settings) -> RagAnswer:
     """Run the complete query-time RAG pipeline for one question."""
     retrieved_chunks = retrieve_for_question(
