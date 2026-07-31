@@ -1,8 +1,4 @@
-"""Provide the eventual command-line entry point for indexing and questioning.
-
-The CLI is intentionally absent at scaffold time. It should later expose clear
-index and ask commands without hiding the underlying learning stages.
-"""
+"""Command-line entry point for indexing PDFs and asking RAG questions."""
 
 import argparse
 from pathlib import Path
@@ -11,16 +7,35 @@ from .config import load_settings
 from .indexing import build_document_index
 from .rag import answer_question
 
+
 def main() -> None:
     """Parse CLI arguments and run the selected indexing or query operation."""
     parser = _build_parser()
     args = parser.parse_args()
 
+    try:
+        _run_command(args)
+    # The CLI is the user-facing boundary; provider and file errors should be
+    # concise here while library callers still receive typed exceptions.
+    except Exception as exc:  # noqa: BLE001
+        parser.exit(status=1, message=f"Error: {exc}\n")
+
+
+def _run_command(args: argparse.Namespace) -> None:
+    """Run one parsed command."""
     settings = load_settings(env_file=args.env_file)
 
     if args.command == "index":
-        build_document_index(settings)
-        print("Document index built successfully.")
+        result = build_document_index(settings)
+        print(
+            f"Indexed {result.pdf_count} PDF(s), "
+            f"{result.page_count} page(s), and "
+            f"{result.chunk_count} chunk(s)."
+        )
+        print(
+            f"Embedding dimension: {result.embedding_dimension}. "
+            f"Index: {result.index_path}"
+        )
         return
 
     if args.command == "ask":
@@ -39,11 +54,7 @@ def main() -> None:
         for source_number, result in enumerate(answer.sources, start=1):
             chunk = result.chunk
 
-            page = (
-                chunk.page_number
-                if chunk.page_number is not None
-                else "unknown"
-            )
+            page = chunk.page_number if chunk.page_number is not None else "unknown"
 
             print(
                 f"[Source {source_number}] "
