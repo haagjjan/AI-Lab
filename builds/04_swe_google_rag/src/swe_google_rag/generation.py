@@ -1,11 +1,4 @@
-"""Format retrieved evidence and call the configured Google-hosted Gemma model.
-
-The future API integration should reuse the proven environment validation and
-model invocation pattern in ../01_mini_rag/google_api_call.py without copying
-that script wholesale. The grounding prompt must require an explicit
-insufficient-information response when retrieved evidence cannot answer the
-question.
-"""
+"""Format retrieved evidence and generate a Google-hosted grounded answer."""
 
 from collections.abc import Sequence
 
@@ -16,9 +9,9 @@ from .config import Settings
 from .schemas import RetrievedChunk
 
 _INSUFFICIENT_INFORMATION_MESSAGE = (
-    "The retrieved documents do not contain enough information "
-    "to answer this question."
+    "The retrieved documents do not contain enough information to answer this question."
 )
+
 
 def format_retrieved_context(results: Sequence[RetrievedChunk]) -> str:
     """Format retrieved text and provenance for the generation prompt."""
@@ -31,9 +24,7 @@ def format_retrieved_context(results: Sequence[RetrievedChunk]) -> str:
         chunk = result.chunk
 
         page_label = (
-            str(chunk.page_number)
-            if chunk.page_number is not None
-            else "unknown"
+            str(chunk.page_number) if chunk.page_number is not None else "unknown"
         )
 
         section_label = chunk.section or "unknown"
@@ -53,8 +44,6 @@ def format_retrieved_context(results: Sequence[RetrievedChunk]) -> str:
         )
 
     return "\n\n---\n\n".join(formatted_sources)
-
-
 
 
 def generate_grounded_answer(
@@ -84,12 +73,7 @@ def generate_grounded_answer(
         f"with: {_INSUFFICIENT_INFORMATION_MESSAGE}"
     )
 
-    user_prompt = (
-        "Retrieved source excerpts:\n\n"
-        f"{context}\n\n"
-        "Question:\n"
-        f"{question}"
-    )
+    user_prompt = f"Retrieved source excerpts:\n\n{context}\n\nQuestion:\n{question}"
 
     client = genai.Client(api_key=settings.google_api_key)
 
@@ -99,7 +83,6 @@ def generate_grounded_answer(
             contents=user_prompt,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
-                temperature=0.2,
             ),
         )
     except Exception as exc:
@@ -111,8 +94,6 @@ def generate_grounded_answer(
     answer = response.text
 
     if answer is None or not answer.strip():
-        raise RuntimeError(
-            "The generation model returned no textual answer."
-        )
+        raise RuntimeError("The generation model returned no textual answer.")
 
     return answer.strip()
